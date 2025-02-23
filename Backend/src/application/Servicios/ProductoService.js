@@ -54,8 +54,7 @@ class ProductoService {
             fechaVencimiento: data.fechaVencimiento,
             categoriaId: categoria.id
         };
-
-        return await this.productoRepositorio.createProducto(productoData);
+        return await Productos.createFromData(productoData);
     }
 
 
