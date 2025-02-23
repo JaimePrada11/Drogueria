@@ -5,41 +5,38 @@ const { Productos } = require('../../domain/modelos/Productos');
 
 class ProductoService {
     constructor() {
-        this.productoRepositorio = new ProductoRepository(); // Instancia del repositorio
-        this.categoriaService =  CategoriaService; 
+        this.productoRepositorio = new ProductoRepository();
+        this.categoriaService = CategoriaService;
     }
 
-    async getAll() {
-        const productos = await this.productoRepositorio.getAllProductos();
-        return productos.map(producto => {
-            const categoriaNombre = producto.Categoria ? producto.Categoria.nombre : null;
-            return new Productos(
-                producto.nombre,
-                producto.descripcion,
-                producto.precio,
-                producto.stock,
-                producto.lote,
-                producto.fechaVencimiento,
-                producto.categoriaId
-            ).toDTO(categoriaNombre);
-        });
-    }
-
-    async getOne(id) {
-        const producto = await this.productoRepositorio.getProductoById(id);
-        if (!producto) {
-            throw new Error("Producto no encontrado");
-        }
+    mapProducto(producto) {
         const categoriaNombre = producto.Categoria ? producto.Categoria.nombre : null;
-        return new Productos(
+        return new ProductoDTO(
             producto.nombre,
             producto.descripcion,
             producto.precio,
             producto.stock,
             producto.lote,
             producto.fechaVencimiento,
-            producto.categoriaId
-        ).toDTO(categoriaNombre);
+            categoriaNombre,
+            producto.fechaEntrada,
+            producto.sku
+        );
+    }
+
+    // Todos los productos
+    async getAll() {
+        const productos = await this.productoRepositorio.getAllProductos();
+        return productos.map(producto => this.mapProducto(producto));
+    }
+
+    // producto por su ID
+    async getById(id) {
+        const producto = await this.productoRepositorio.getProductoById(id);
+        if (!producto) {
+            throw new Error("Producto no encontrado");
+        }
+        return this.mapProducto(producto);
     }
 
     async create(data) {
@@ -47,7 +44,7 @@ class ProductoService {
         if (!categoria) {
             categoria = await this.categoriaService.createCategoria({ nombre: data.categoriaNombre });
         }
-        
+
         const productoData = {
             nombre: data.nombre,
             descripcion: data.descripcion,
@@ -55,37 +52,42 @@ class ProductoService {
             stock: data.stock,
             lote: data.lote,
             fechaVencimiento: data.fechaVencimiento,
-            categoriaId: categoria.id  // Asegúrate de que este ID sea válido
+            categoriaId: categoria.id
         };
-        
+
         return await this.productoRepositorio.createProducto(productoData);
     }
-    
-    
+
+
     async update(id, newData) {
-        let categoria = await this.categoriaService.getCategoriaByNombre(newData.categoriaNombre);
-
-        if (!categoria) {
-            categoria = await this.categoriaService.createCategoria({ nombre: newData.categoriaNombre });
-        }
-
-        const productoDTO = new ProductoDTO(
-            newData.nombre,
-            newData.descripcion,
-            newData.precio,
-            newData.stock,
-            newData.lote,
-            newData.fechaVencimiento,
-            categoria.nombre
-        );
-
         const producto = await this.productoRepositorio.getProductoById(id);
         if (!producto) {
             throw new Error("Producto no encontrado");
         }
-        return await producto.update(productoDTO);
+
+        let updateData = {};
+        if (newData.nombre !== undefined) updateData.nombre = newData.nombre;
+        if (newData.descripcion !== undefined) updateData.descripcion = newData.descripcion;
+        if (newData.precio !== undefined) updateData.precio = newData.precio;
+        if (newData.stock !== undefined) updateData.stock = newData.stock;
+        if (newData.lote !== undefined) updateData.lote = newData.lote;
+        if (newData.fechaVencimiento !== undefined) updateData.fechaVencimiento = newData.fechaVencimiento;
+
+        if (newData.categoriaNombre !== undefined) {
+            let categoria = await this.categoriaService.getCategoriaByNombre(newData.categoriaNombre);
+            if (!categoria) {
+                categoria = await this.categoriaService.createCategoria({ nombre: newData.categoriaNombre });
+            }
+            updateData.categoriaId = categoria.id;
+        }
+
+        const productoActualizado = await producto.update(updateData);
+
+        return this.mapProducto(productoActualizado);
+
     }
 
+    // Eliminar Producto
     async delete(id) {
         const producto = await this.productoRepositorio.getProductoById(id);
         if (!producto) {
@@ -94,35 +96,39 @@ class ProductoService {
         return await this.productoRepositorio.deleteProducto(producto);
     }
 
+    // Los productos según la categoría 
     async getProductosByCategoria(categoriaNombre) {
         const categoria = await this.categoriaService.getCategoriaByNombre(categoriaNombre);
         if (!categoria) {
             throw new Error("Categoría no encontrada");
         }
         const productos = await this.productoRepositorio.getProductosByCategoria(categoria.id);
-        return productos.map(producto => new ProductoDTO(
-            producto.nombre,
-            producto.descripcion,
-            producto.precio,
-            producto.stock,
-            producto.lote,
-            producto.fechaVencimiento,
-            categoria.nombre
-        ));
+        return productos.map(producto => this.mapProducto(producto));
     }
 
+
+    // Los productos por nombre 
+    async getProductosByNombre(nombre) {
+        const productos = await this.productoRepositorio.getProductosByNombre(nombre);
+        return productos.map(producto => this.mapProducto(producto));
+    }
+
+    // productos ingresados entre dos fechas (rango en fechaEntrada)
+    async getProductosByFechaEntrada(fechaInicio, fechaFin) {
+        const productos = await this.productoRepositorio.getProductosByFechaEntrada(fechaInicio, fechaFin);
+        return productos.map(producto => this.mapProducto(producto));
+    }
+
+    // los productos vencidos 
+    async getProductosVencidos() {
+        const productos = await this.productoRepositorio.getProductosVencidos();
+        return productos.map(producto => this.mapProducto(producto));
+    }
+
+    // Los productos dentro de un rango de precios
     async getProductosByPrecio(min, max) {
-        const productos = await this.productoRepositorio.getProductosByPrecio(min, max);
-        return productos.map(producto => new ProductoDTO(
-            producto.nombre,
-            producto.descripcion,
-            producto.precio,
-            producto.stock,
-            producto.lote,
-            producto.fechaVencimiento,
-            producto.Categoria.nombre
-        ));
+        const productos = await this.productoRepositorio.getProductosByRangoPrecio(min, max);
+        return productos.map(producto => this.mapProducto(producto));
     }
 }
-
-module.exports =  new ProductoService();
+module.exports = new ProductoService();

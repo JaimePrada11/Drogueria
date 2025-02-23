@@ -28,7 +28,9 @@ class Productos {
             this._stock,
             this._lote,
             this._fechaVencimiento,
-            categoriaNombre
+            categoriaNombre,
+            this._sku,              
+            this._fechaEntrada       
         );
     }
 
@@ -103,6 +105,24 @@ class Productos {
     set sku(newSku) {
         this._sku = newSku;
     }
+
+    incrementarStock(cantidad) {
+        this._stock += cantidad;
+    }
+    
+    disminuirStock(cantidad) {
+        if (this._stock - cantidad < 0) {
+            throw new Error("Stock insuficiente");
+        }
+        this._stock -= cantidad;
+    }
+
+    estaVencido() {
+        if (!this._fechaVencimiento) return false;
+        return new Date() > new Date(this._fechaVencimiento);
+    }
+    
+    
 
     static async createFromData(productoData) {
         const producto = new Productos(

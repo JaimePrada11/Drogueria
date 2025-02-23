@@ -1,12 +1,14 @@
 class ProductoDTO {
-    constructor(nombre, descripcion, precio, stock, lote, fechaVencimiento, categoriaNombre) {
-        this.nombre = nombre;
-        this.descripcion = descripcion;
-        this.precio = precio;
-        this.stock = stock;
-        this.lote = lote;
-        this.fechaVencimiento = fechaVencimiento;
-        this.categoriaNombre = categoriaNombre;
+    constructor(nombre, descripcion, precio, stock, lote, fechaVencimiento, categoriaNombre, sku, fechaEntrada) {
+        this._nombre = nombre;
+        this._descripcion = descripcion;
+        this._precio = precio;
+        this._stock = stock;
+        this._lote = lote;
+        this._fechaVencimiento = fechaVencimiento;
+        this._categoriaNombre = categoriaNombre;
+        this._sku = sku;
+        this._fechaEntrada = fechaEntrada;
     }
 
     get nombre() {
@@ -63,6 +65,22 @@ class ProductoDTO {
 
     set categoriaNombre(newCategoriaNombre) {
         this._categoriaNombre = newCategoriaNombre;
+    }
+
+    get sku() {
+        return this._sku;
+    }
+
+    set sku(newSku) {
+        this._sku = newSku;
+    }
+
+    get fechaEntrada() {
+        return this._fechaEntrada;
+    }
+
+    set fechaEntrada(newFechaEntrada) {
+        this._fechaEntrada = newFechaEntrada;
     }
 }
 

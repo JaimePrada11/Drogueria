@@ -58,27 +58,78 @@ class ProductoRepository {
 
     async getProductosByCategoria(categoriaId) {
         try {
-            return await ProductoModel.findAll({ where: { categoriaId } });
+            return await ProductoModel.findAll({
+                where: { categoriaId },
+                include: [{ model: CategoriaModel,as: 'Categoria', attributes: ['nombre']}]
+            });
         } catch (error) {
             console.error("Error obteniendo productos por categoría:", error);
             throw new Error("No se pudieron obtener los productos por categoría.");
         }
     }
 
-    async getProductosByPrecio(min, max) {
+    async getProductosByNombre(nombre) {
+        try {
+            return await ProductoModel.findAll({
+                where: { 
+                    nombre: { [Op.like]: `%${nombre}%` }
+                },
+                include: [{ model: CategoriaModel, as: 'Categoria', attributes: ['nombre'] }]
+            });
+        } catch (error) {
+            console.error("Error buscando productos por nombre:", error);
+            throw new Error("No se pudo buscar productos por nombre.");
+        }
+    }
+    
+    async getProductosByFechaEntrada(fechaInicio, fechaFin) {
         try {
             return await ProductoModel.findAll({
                 where: {
-                    precio: {
-                        [Op.between]: [min, max]
+                    fechaEntrada: {
+                        [Op.between]: [fechaInicio, fechaFin]
                     }
-                }
+                },
+                include: [{ model: CategoriaModel, as: 'Categoria', attributes: ['nombre'] }]
+            });
+        } catch (error) {
+            console.error("Error obteniendo productos por fecha de entrada:", error);
+            throw new Error("No se pudieron obtener los productos por fecha de entrada.");
+        }
+    }
+    
+    async getProductosVencidos() {
+        try {
+            return await ProductoModel.findAll({
+                where: {
+                    fechaVencimiento: {
+                        [Op.lt]: new Date()
+                    }
+                },
+                include: [{ model: CategoriaModel, as: 'Categoria', attributes: ['nombre'] }]
+            });
+        } catch (error) {
+            console.error("Error obteniendo productos vencidos:", error);
+            throw new Error("No se pudieron obtener los productos vencidos.");
+        }
+    }
+
+    async getProductosByRangoPrecio(precioMin, precioMax) {
+        try {
+            return await ProductoModel.findAll({
+                where: { 
+                    precio: { [Op.between]: [precioMin, precioMax] }
+                },
+                include: [{ model: CategoriaModel, as: 'Categoria', attributes: ['nombre'] }]
             });
         } catch (error) {
             console.error("Error obteniendo productos por rango de precio:", error);
-            throw new Error("No se pudieron obtener los productos por rango de precio.");
+            throw new Error("No se pudo obtener los productos por rango de precio.");
         }
     }
+    
+    
+    
 }
 
-module.exports = ProductoRepository; // Asegúrate de exportar la clase, no una instancia
+module.exports = ProductoRepository; 
