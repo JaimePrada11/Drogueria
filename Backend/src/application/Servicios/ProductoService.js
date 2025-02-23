@@ -1,12 +1,12 @@
-const { ProductoDTO } = require('../../dto/ProductoDTO');
-const { ProductoRepository } = require('../Repositories/ProductoRepositorio');
-const CategoriaService = require('../services/CategoriaService'); 
+const ProductoRepository = require('../Repositories/ProductoRepositorio');
+const CategoriaService = require('../Servicios/CategoriaService');
+const { ProductoDTO } = require('../../domain/DTO/ProductoDTO');
 const { Productos } = require('../../domain/modelos/Productos');
 
 class ProductoService {
     constructor() {
-        this.productoRepositorio = new ProductoRepository();
-        this.categoriaService = CategoriaService; 
+        this.productoRepositorio = new ProductoRepository(); // Instancia del repositorio
+        this.categoriaService =  CategoriaService; 
     }
 
     async getAll() {
@@ -44,24 +44,24 @@ class ProductoService {
 
     async create(data) {
         let categoria = await this.categoriaService.getCategoriaByNombre(data.categoriaNombre);
-
         if (!categoria) {
             categoria = await this.categoriaService.createCategoria({ nombre: data.categoriaNombre });
         }
-
-        const productoDTO = new ProductoDTO(
-            data.nombre,
-            data.descripcion,
-            data.precio,
-            data.stock,
-            data.lote,
-            data.fechaVencimiento,
-            categoria.nombre
-        );
-
-        return await this.productoRepositorio.createProducto(productoDTO);
+        
+        const productoData = {
+            nombre: data.nombre,
+            descripcion: data.descripcion,
+            precio: data.precio,
+            stock: data.stock,
+            lote: data.lote,
+            fechaVencimiento: data.fechaVencimiento,
+            categoriaId: categoria.id  // Asegúrate de que este ID sea válido
+        };
+        
+        return await this.productoRepositorio.createProducto(productoData);
     }
-
+    
+    
     async update(id, newData) {
         let categoria = await this.categoriaService.getCategoriaByNombre(newData.categoriaNombre);
 
@@ -125,4 +125,4 @@ class ProductoService {
     }
 }
 
-module.exports = ProductoService;
+module.exports =  new ProductoService();

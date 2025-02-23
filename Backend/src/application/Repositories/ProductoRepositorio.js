@@ -6,18 +6,18 @@ class ProductoRepository {
     async getAllProductos() {
         try {
             return await ProductoModel.findAll({
-                include: { model: CategoriaModel, attributes: ['nombre'] }
+                include: [{ model: CategoriaModel, as: 'Categoria', attributes: ['nombre'] }]
             });
         } catch (error) {
             console.error("Error obteniendo todos los productos:", error);
             throw new Error("No se pudo obtener los productos.");
         }
     }
-
+    
     async getProductoById(id) {
         try {
             const producto = await ProductoModel.findByPk(id, {
-                include: { model: CategoriaModel, attributes: ['nombre'] }
+                include: [{ model: CategoriaModel, as: 'Categoria', attributes: ['nombre'] }]
             });
             if (!producto) {
                 throw new Error("Producto no encontrado");
@@ -28,6 +28,7 @@ class ProductoRepository {
             throw new Error("No se pudo obtener el producto.");
         }
     }
+    
 
     async createProducto(producto) {
         const transaction = await sequelize.transaction();
@@ -80,4 +81,4 @@ class ProductoRepository {
     }
 }
 
-module.exports = new ProductoRepository();
+module.exports = ProductoRepository; // Asegúrate de exportar la clase, no una instancia

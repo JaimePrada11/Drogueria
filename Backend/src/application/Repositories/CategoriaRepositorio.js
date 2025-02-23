@@ -1,8 +1,6 @@
 const { CategoriaModel } = require('../../domain/modelos/Categoria');
 
 class CategoriaRepository {
-
-    // Obtener todas las categorías
     async getAllCategorias() {
         try {
             return await CategoriaModel.findAll();
@@ -12,7 +10,6 @@ class CategoriaRepository {
         }
     }
 
-    // Obtener una categoría por ID
     async getCategoriaById(id) {
         try {
             return await CategoriaModel.findByPk(id);
@@ -22,10 +19,9 @@ class CategoriaRepository {
         }
     }
 
-    // Obtener una categoría por nombre
     async getCategoriaByNombre(nombre) {
         try {
-            const categoria = await CategoriaModel.findOne({where: { nombre }});
+            const categoria = await CategoriaModel.findOne({ where: { nombre } });
             return categoria;
         } catch (error) {
             console.error("Error obteniendo la categoría por nombre:", error);
@@ -33,7 +29,6 @@ class CategoriaRepository {
         }
     }
 
-    // Crear una nueva categoría
     async createCategoria(categoriaData) {
         try {
             if (!categoriaData.nombre || typeof categoriaData.nombre !== 'string') {
@@ -46,8 +41,6 @@ class CategoriaRepository {
         }
     }
 
-
-    // Eliminar una categoría por ID
     async deleteCategoria(id) {
         try {
             const categoria = await this.getCategoriaById(id);
@@ -55,7 +48,7 @@ class CategoriaRepository {
                 await categoria.destroy();
                 return categoria;
             }
-            return null; 
+            return null;
         } catch (error) {
             console.error("Error eliminando la categoría:", error);
             throw new Error("No se pudo eliminar la categoría.");
@@ -63,4 +56,4 @@ class CategoriaRepository {
     }
 }
 
-module.exports = new CategoriaRepository();
+module.exports = CategoriaRepository; 

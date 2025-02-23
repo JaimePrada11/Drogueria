@@ -1,8 +1,8 @@
-const { CategoriaRepository } = require('../Repositories/CategoriaRepositorio');
+const CategoriaRepository = require('../Repositories/CategoriaRepositorio');
 
 class CategoriaService {
     constructor() {
-        this.categoriaRepository = CategoriaRepository;
+        this.categoriaRepository = new CategoriaRepository(); 
     }
 
     async getAllCategorias() {

@@ -177,6 +177,6 @@ const ProductoModel = sequelize.define('Productos', {
     timestamps: false 
 });
 
-ProductoModel.belongsTo(CategoriaModel, { foreignKey: 'categoriaId' });
+ProductoModel.belongsTo(CategoriaModel, { foreignKey: 'categoriaId', as: 'Categoria' });
 
 module.exports = { Productos, ProductoModel };
