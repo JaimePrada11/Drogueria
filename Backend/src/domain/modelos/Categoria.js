@@ -17,9 +17,8 @@ class Categoria {
 
 
     static async createFromData(categoryData) {
-        const category = new Categoria(categoryData.nombre);
         return await CategoriaModel.create({
-            nombre: category.nombre
+            nombre: categoryData.nombre
         });
     }
 }
@@ -32,7 +31,8 @@ const CategoriaModel = sequelize.define('Categoria', {
     },
     nombre: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
+        unique: true
     }
 },
 {
