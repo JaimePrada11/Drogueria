@@ -1,6 +1,7 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../../../config/database');
 const { CategoriaModel } = require('./Categoria');
+const { ProductoDTO } = require('../DTO/ProductoDTO');
 
 class Productos {
     constructor(nombre, descripcion, precio, stock, lote, fechaVencimiento, categoriaId) {
@@ -17,6 +18,18 @@ class Productos {
 
     generarSKU() {
         return `SKU-${Math.random().toString(36).substr(2, 9).toUpperCase()}`; 
+    }
+
+    toDTO(categoriaNombre) {
+        return new ProductoDTO(
+            this._nombre,
+            this._descripcion,
+            this._precio,
+            this._stock,
+            this._lote,
+            this._fechaVencimiento,
+            categoriaNombre
+        );
     }
 
     get nombre() {

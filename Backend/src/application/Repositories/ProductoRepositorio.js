@@ -1,10 +1,13 @@
 const { ProductoModel } = require('../../domain/modelos/Productos');
+const { CategoriaModel } = require('../../domain/modelos/Categoria');
+const { sequelize, Op } = require('sequelize');
 
 class ProductoRepository {
-
     async getAllProductos() {
         try {
-            return await ProductoModel.findAll();
+            return await ProductoModel.findAll({
+                include: { model: CategoriaModel, attributes: ['nombre'] }
+            });
         } catch (error) {
             console.error("Error obteniendo todos los productos:", error);
             throw new Error("No se pudo obtener los productos.");
@@ -13,7 +16,9 @@ class ProductoRepository {
 
     async getProductoById(id) {
         try {
-            const producto = await ProductoModel.findByPk(id);
+            const producto = await ProductoModel.findByPk(id, {
+                include: { model: CategoriaModel, attributes: ['nombre'] }
+            });
             if (!producto) {
                 throw new Error("Producto no encontrado");
             }
