@@ -34,6 +34,8 @@ const CategoriaModel = sequelize.define('Categoria', {
         type: DataTypes.STRING,
         allowNull: false
     }
+},
+{
+    timestamps: false 
 });
-
 module.exports = { Categoria, CategoriaModel };
