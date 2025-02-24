@@ -3,6 +3,8 @@ import Table from '../components/Table';
 import useApi from '../hooks/useApi';
 import Form from '../components/Form';
 import axios from 'axios';
+import Header from "../components/Header";
+
 
 const Inventario = () => {
     const { data: productosData, deleteData, putData, postData, refetch, loading, error } = useApi('productos');
@@ -129,71 +131,84 @@ const Inventario = () => {
     };
 
     return (
-        <div className="container mx-auto p-4">
+        <>
 
-            <h1 className="text-4xl font-bold text-center mb-6">
-                Inventario
-            </h1>
-            <div className="flex justify-end mb-4">
-                <button
-                    onClick={handleCreate}
-                    className="px-4 py-2 bg-green-500 text-white rounded text-sm"
-                >
-                    Nuevo Producto
-                </button>
+            <Header />
+
+            <div className="container mx-auto p-4">
+
+
+
+
+                <h1 className="text-4xl font-bold text-center mb-6">
+                    Inventario
+                </h1>
+                <div className="flex justify-end mb-4">
+                    <button
+                        onClick={handleCreate}
+                        className="px-4 py-2 bg-blue-500 text-white rounded text-sm"
+                    >
+                        Nuevo Producto
+                    </button>
+                </div>
+
+                {loading && <p className="text-center text-gray-600">Cargando inventario...</p>}
+                {error && <p className="text-center text-red-500">{error}</p>}
+                {!loading && !error && (
+                    <Table
+                        columns={displayColumns}
+                        data={formatData(productosData)}
+                        onEdit={handleEdit}
+                        onDelete={handleDelete}
+                    />
+                )}
+
+
+                {/* Modal para creación/edición */}
+                {editingProduct !== null && (
+                    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 overflow-auto">
+                        <div className="bg-white p-6 rounded shadow-md w-full max-w-md mx-4">
+                            <h2 className="text-2xl font-bold text-gray-800 text-center mb-6">
+                                {editingProduct && editingProduct._sku ? "Editar Producto" : "Nuevo Producto"}
+                            </h2>
+                            <form onSubmit={handleFormSubmit}>
+                                <Form
+                                    fields={formFields}
+                                    initialData={formData}
+                                    onChange={handleFormChange}
+                                />
+                                <div className="mt-4 flex justify-end">
+                                    <button
+                                        type="button"
+                                        onClick={handleCancelEdit}
+                                        className="mr-2 px-4 py-2 bg-gray-500 text-white rounded text-sm"
+                                    >
+                                        Cancelar
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        className="px-4 py-2 bg-blue-500 text-white rounded text-sm"
+                                    >
+                                        Guardar
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                )}
+
+                <datalist id="categorias">
+                    {categorySuggestions.map(cat => (
+                        <option key={cat.id} value={cat.nombre} />
+                    ))}
+                </datalist>
             </div>
 
-            {loading && <p className="text-center text-gray-600">Cargando inventario...</p>}
-            {error && <p className="text-center text-red-500">{error}</p>}
-            {!loading && !error && (
-                <Table
-                    columns={displayColumns}
-                    data={formatData(productosData)}
-                    onEdit={handleEdit}
-                    onDelete={handleDelete}
-                />
-            )}
+            <div className="container mx-auto p-4 text-center text-sm text-gray-500 mt-4">
+                © {new Date().getFullYear()} MiDrogueria. Todos los derechos reservados.
+            </div>
+        </>
 
-
-            {/* Modal para creación/edición */}
-            {editingProduct !== null && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 overflow-auto">
-                    <div className="bg-white p-6 rounded shadow-md w-full max-w-md mx-4">
-                        <h2 className="text-2xl font-bold text-gray-800 text-center mb-6">
-                            {editingProduct && editingProduct._sku ? "Editar Producto" : "Nuevo Producto"}
-                        </h2>
-                        <form onSubmit={handleFormSubmit}>
-                            <Form
-                                fields={formFields}
-                                initialData={formData}
-                                onChange={handleFormChange}
-                            />
-                            <div className="mt-4 flex justify-end">
-                                <button
-                                    type="button"
-                                    onClick={handleCancelEdit}
-                                    className="mr-2 px-4 py-2 bg-gray-500 text-white rounded text-sm"
-                                >
-                                    Cancelar
-                                </button>
-                                <button
-                                    type="submit"
-                                    className="px-4 py-2 bg-blue-500 text-white rounded text-sm"
-                                >
-                                    Guardar
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            )}
-
-            <datalist id="categorias">
-                {categorySuggestions.map(cat => (
-                    <option key={cat.id} value={cat.nombre} />
-                ))}
-            </datalist>
-        </div>
     );
 };
 
