@@ -73,7 +73,7 @@ const useApi = (endpoint) => {
     }
   };
 
-  return { axiosInstance, data, loading, error, postData, putData, deleteData };
+  return { axiosInstance, data, loading, error,   refetch: fetchData ,    postData, putData, deleteData };
 };
 
 export default useApi;

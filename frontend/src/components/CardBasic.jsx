@@ -4,7 +4,7 @@ const CardBasic = ({ data }) => {
     return (
         <div className="relative flex flex-col font-sans items-center p-4 bg-white shadow rounded border border-gray-200 w-80">
             <div className="w-full flex justify-center">
-                <img src={data.image} alt={data.nombre} className="w-full h-auto object-contain rounded-md shadow-xl" />
+                <img src={data.image} alt={data.nombre} className="w-full h-64 object-contain rounded-md " />
             </div>
             
             <div className="flex flex-col items-center mt-4 w-full relative">

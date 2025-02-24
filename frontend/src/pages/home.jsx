@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import List from "../components/List";
 import CardBasic from "../components/CardBasic";
 import useApi from "../hooks/useApi";
@@ -8,14 +8,29 @@ const Home = () => {
     const [search, setSearch] = useState("");
     const [selectedCategory, setSelectedCategory] = useState("");
 
-    const endpoint = selectedCategory
-        ? `productos/categoria/${selectedCategory}`
-        : "productos";
+    // Llamada para obtener TODOS los productos (sin filtro) para el cálculo inicial de categorías
+    const { data: allProductosData } = useApi("productos");
+    // Llamada para obtener productos filtrados según la categoría seleccionada (o todos si no hay filtro)
+    const endpoint = selectedCategory ? `productos/categoria/${selectedCategory}` : "productos";
     const { data: productosData, loading, error } = useApi(endpoint);
     const { data: categoriaData } = useApi("categorias");
 
-    // Definimos un arreglo de iconos genéricos en orden fijo
     const icons = [FaPills, FaSyringe, FaBandAid, FaPrescriptionBottle];
+
+    // Calcular el orden inicial de categorías basándose en allProductosData (que no cambia)
+    const sortedCategories = useMemo(() => {
+        if (!allProductosData || !categoriaData) return [];
+        const count = {};
+        allProductosData.forEach(producto => {
+            const nombre = producto._categoriaNombre;
+            if (nombre) {
+                count[nombre] = (count[nombre] || 0) + 1;
+            }
+        });
+        return [...categoriaData]
+            .sort((a, b) => (count[b.nombre] || 0) - (count[a.nombre] || 0))
+            .slice(0, 4);
+    }, [allProductosData, categoriaData]);
 
     let displayedProducts = [];
     if (!selectedCategory && !search) {
@@ -33,11 +48,7 @@ const Home = () => {
     }
 
     const handleCategoryClick = (categoryName) => {
-        if (selectedCategory === categoryName) {
-            setSelectedCategory("");
-        } else {
-            setSelectedCategory(categoryName);
-        }
+        setSelectedCategory(prev => (prev === categoryName ? "" : categoryName));
     };
 
     return (
@@ -53,27 +64,28 @@ const Home = () => {
             {loading && <p className="text-center text-gray-600">Cargando productos...</p>}
             {error && <p className="text-center text-red-500">{error}</p>}
 
+            {/* Mostrar siempre las 4 categorías en el orden calculado inicialmente */}
             <div className="my-4 flex gap-4 flex-wrap justify-center">
-                {categoriaData &&
-                    categoriaData.slice(0, 4).map((cat, i) => {
-                        const Icon = icons[i % icons.length];
-                        return (
-                            <button
-                                key={cat._id || cat.id || cat.nombre}
-                                onClick={() => handleCategoryClick(cat.nombre)}
-                                className={`w-24 h-24 p-4 rounded-lg flex flex-col items-center justify-center gap-2 transition-all duration-300 ${
-                                    selectedCategory === cat.nombre
-                                        ? "bg-blue-500 text-white shadow-lg"
-                                        : "bg-gray-200 text-gray-800 hover:bg-blue-300"
-                                }`}
-                            >
-                                <Icon className="text-4xl" />
-                                <span className="text-sm">{cat.nombre}</span>
-                            </button>
-                        );
-                    })}
+                {sortedCategories.map((cat, i) => {
+                    const Icon = icons[i % icons.length];
+                    return (
+                        <button
+                            key={cat._id || cat.id || cat.nombre}
+                            onClick={() => handleCategoryClick(cat.nombre)}
+                            className={`w-24 h-24 p-4 rounded-lg flex flex-col items-center justify-center gap-2 transition-all duration-300 ${
+                                selectedCategory === cat.nombre
+                                    ? "bg-blue-500 text-white shadow-lg"
+                                    : "bg-gray-200 text-gray-800 hover:bg-blue-300"
+                            }`}
+                        >
+                            <Icon className="text-4xl" />
+                            <span className="text-sm">{cat.nombre}</span>
+                        </button>
+                    );
+                })}
             </div>
 
+            {/* Barra de búsqueda */}
             <div className="my-4 flex justify-center">
                 <div className="w-full max-w-md relative">
                     <input
