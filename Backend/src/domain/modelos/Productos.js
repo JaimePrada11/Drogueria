@@ -4,7 +4,8 @@ const { CategoriaModel } = require('./Categoria');
 const { ProductoDTO } = require('../DTO/ProductoDTO');
 
 class Productos {
-    constructor(nombre, descripcion, precio, stock, lote, fechaVencimiento, categoriaId) {
+    constructor(imagen, nombre, descripcion, precio, stock, lote, fechaVencimiento, categoriaId) {
+        this._imagen = imagen;
         this._nombre = nombre;
         this._descripcion = descripcion;
         this._precio = precio;
@@ -22,6 +23,7 @@ class Productos {
 
     toDTO(categoriaNombre) {
         return new ProductoDTO(
+            this._imagen,
             this._nombre,
             this._descripcion,
             this._precio,
@@ -32,6 +34,14 @@ class Productos {
             this._sku,              
             this._fechaEntrada       
         );
+    }
+
+    getImagen(){
+        return this._imagen;
+    }
+
+    setImagen(newImagen){
+        this._imagen = newImagen;
     }
 
     get nombre() {
@@ -122,10 +132,13 @@ class Productos {
         return new Date() > new Date(this._fechaVencimiento);
     }
     
-    
-
     static async createFromData(productoData) {
+        if (!productoData.imagen) {
+            throw new Error("La imagen es obligatoria");
+        }
+    
         const producto = new Productos(
+            productoData.imagen, 
             productoData.nombre,
             productoData.descripcion,
             productoData.precio,
@@ -134,8 +147,9 @@ class Productos {
             productoData.fechaVencimiento,
             productoData.categoriaId
         );
-
+    
         return await ProductoModel.create({
+            imagen: producto._imagen, 
             nombre: producto.nombre,
             descripcion: producto.descripcion,
             precio: producto.precio,
@@ -147,6 +161,7 @@ class Productos {
             sku: producto.sku 
         });
     }
+    
 }
 
 const ProductoModel = sequelize.define('Productos', {
@@ -154,6 +169,10 @@ const ProductoModel = sequelize.define('Productos', {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true
+    },
+    imagen: {
+        type: DataTypes.STRING,
+        allowNull: false
     },
     nombre: {
         type: DataTypes.STRING,
@@ -192,8 +211,7 @@ const ProductoModel = sequelize.define('Productos', {
         allowNull: false,
         unique: true  
     }
-},
-{
+}, {
     timestamps: false 
 });
 

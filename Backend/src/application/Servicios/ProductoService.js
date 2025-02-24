@@ -12,6 +12,7 @@ class ProductoService {
     mapProducto(producto) {
         const categoriaNombre = producto.Categoria ? producto.Categoria.nombre : null;
         return new ProductoDTO(
+            producto.imagen,
             producto.nombre,
             producto.descripcion,
             producto.precio,
@@ -19,8 +20,9 @@ class ProductoService {
             producto.lote,
             producto.fechaVencimiento,
             categoriaNombre,
-            producto.fechaEntrada,
-            producto.sku
+            producto.sku,
+            producto.fechaEntrada
+            
         );
     }
 
@@ -46,6 +48,7 @@ class ProductoService {
         }
 
         const productoData = {
+            imagen: data.imagen,
             nombre: data.nombre,
             descripcion: data.descripcion,
             precio: data.precio,
@@ -65,6 +68,7 @@ class ProductoService {
         }
 
         let updateData = {};
+        if (newData.imagen !== undefined) { updateData.imagen = newData.imagen; }
         if (newData.nombre !== undefined) updateData.nombre = newData.nombre;
         if (newData.descripcion !== undefined) updateData.descripcion = newData.descripcion;
         if (newData.precio !== undefined) updateData.precio = newData.precio;
@@ -87,12 +91,12 @@ class ProductoService {
     }
 
     // Eliminar Producto
-    async delete(id) {
-        const producto = await this.productoRepositorio.getProductoById(id);
+    async delete(sku) {
+        const producto = await this.productoRepositorio.getProductoBySku(sku);
         if (!producto) {
             throw new Error("Producto no encontrado");
         }
-        return await this.productoRepositorio.deleteProducto(producto);
+        return await this.productoRepositorio.deleteProducto(producto.sku);
     }
 
     // Los productos según la categoría 

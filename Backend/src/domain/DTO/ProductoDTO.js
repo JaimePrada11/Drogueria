@@ -1,5 +1,6 @@
 class ProductoDTO {
-    constructor(nombre, descripcion, precio, stock, lote, fechaVencimiento, categoriaNombre, sku, fechaEntrada) {
+    constructor(imagen, nombre, descripcion, precio, stock, lote, fechaVencimiento, categoriaNombre, sku, fechaEntrada) {
+        this._imagen = imagen;
         this._nombre = nombre;
         this._descripcion = descripcion;
         this._precio = precio;
@@ -9,6 +10,14 @@ class ProductoDTO {
         this._categoriaNombre = categoriaNombre;
         this._sku = sku;
         this._fechaEntrada = fechaEntrada;
+    }
+
+    getImagen(){
+        return this._imagen;
+    }
+
+    setImagen(newImagen){
+        this._imagen = newImagen;
     }
 
     get nombre() {

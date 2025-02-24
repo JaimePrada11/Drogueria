@@ -1,6 +1,8 @@
 const { ProductoModel } = require('../../domain/modelos/Productos');
 const { CategoriaModel } = require('../../domain/modelos/Categoria');
-const { sequelize, Op } = require('sequelize');
+const { sequelize } = require('../../../config/database');
+const { Op } = require('sequelize');
+
 
 class ProductoRepository {
     async getAllProductos() {
@@ -13,7 +15,7 @@ class ProductoRepository {
             throw new Error("No se pudo obtener los productos.");
         }
     }
-    
+
     async getProductoById(id) {
         try {
             const producto = await ProductoModel.findByPk(id, {
@@ -28,7 +30,24 @@ class ProductoRepository {
             throw new Error("No se pudo obtener el producto.");
         }
     }
-    
+
+    async getProductoBySku(sku) {
+        try {
+            const producto = await ProductoModel.findOne({
+                where: { sku },
+                include: [{ model: CategoriaModel, as: 'Categoria', attributes: ['nombre'] }]
+            });
+            if (!producto) {
+                throw new Error("Producto no encontrado");
+            }
+            return producto;
+        } catch (error) {
+            console.error("Error obteniendo producto por SKU:", error);
+            throw new Error("No se pudo obtener el producto.");
+        }
+    }
+
+
 
     async createProducto(producto) {
         const transaction = await sequelize.transaction();
@@ -43,10 +62,10 @@ class ProductoRepository {
         }
     }
 
-    async deleteProducto(producto) {
+    async deleteProducto(sku) {
         const transaction = await sequelize.transaction();
         try {
-            const resultado = await ProductoModel.destroy({ where: { id: producto.id }, transaction });
+            const resultado = await ProductoModel.destroy({ where: { sku: sku }, transaction });
             await transaction.commit();
             return resultado;
         } catch (error) {
@@ -60,7 +79,7 @@ class ProductoRepository {
         try {
             return await ProductoModel.findAll({
                 where: { categoriaId },
-                include: [{ model: CategoriaModel,as: 'Categoria', attributes: ['nombre']}]
+                include: [{ model: CategoriaModel, as: 'Categoria', attributes: ['nombre'] }]
             });
         } catch (error) {
             console.error("Error obteniendo productos por categoría:", error);
@@ -71,7 +90,7 @@ class ProductoRepository {
     async getProductosByNombre(nombre) {
         try {
             return await ProductoModel.findAll({
-                where: { 
+                where: {
                     nombre: { [Op.like]: `%${nombre}%` }
                 },
                 include: [{ model: CategoriaModel, as: 'Categoria', attributes: ['nombre'] }]
@@ -81,7 +100,7 @@ class ProductoRepository {
             throw new Error("No se pudo buscar productos por nombre.");
         }
     }
-    
+
     async getProductosByFechaEntrada(fechaInicio, fechaFin) {
         try {
             return await ProductoModel.findAll({
@@ -97,7 +116,7 @@ class ProductoRepository {
             throw new Error("No se pudieron obtener los productos por fecha de entrada.");
         }
     }
-    
+
     async getProductosVencidos() {
         try {
             return await ProductoModel.findAll({
@@ -117,7 +136,7 @@ class ProductoRepository {
     async getProductosByRangoPrecio(precioMin, precioMax) {
         try {
             return await ProductoModel.findAll({
-                where: { 
+                where: {
                     precio: { [Op.between]: [precioMin, precioMax] }
                 },
                 include: [{ model: CategoriaModel, as: 'Categoria', attributes: ['nombre'] }]
@@ -127,9 +146,9 @@ class ProductoRepository {
             throw new Error("No se pudo obtener los productos por rango de precio.");
         }
     }
-    
-    
-    
+
+
+
 }
 
 module.exports = ProductoRepository; 

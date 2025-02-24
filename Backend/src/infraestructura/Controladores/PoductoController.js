@@ -28,11 +28,14 @@ class ProductoController {
 
     deleteProducto = async (req, res) => {
         try {
-            const id = req.params.id;
-            await this.productoService.delete(id);
-            res.json({ message: 'Producto eliminado con éxito' });
+            const { sku } = req.params; 
+            if (!sku) {
+                return res.status(400).json({ message: 'El SKU es obligatorio' });
+            }
+            await this.productoService.delete(sku);
+            return res.status(204).json({ message: 'Producto eliminado con éxito' });
         } catch (error) {
-            res.status(500).json({ message: 'Error al eliminar producto', error });
+            return res.status(400).json({ message: error.message });
         }
     }
 
