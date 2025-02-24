@@ -7,10 +7,10 @@ const config = {
     db: {
         host: process.env.DB_HOST || 'localhost',
         username: process.env.DB_USER || 'root',
-        password: process.env.DB_PASSWORD || 'J12345',
+        password: process.env.DB_PASSWORD || '',
         database: process.env.DB_NAME || 'drogueria',
         dialect: process.env.DB_DIALECT || 'mysql', 
-        logging: true,
+        logging: process.env.DB_LOGGING === 'true',
     }
 };
 

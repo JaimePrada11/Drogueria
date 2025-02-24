@@ -5,6 +5,9 @@ const sequelize = new Sequelize(config.db.database, config.db.username, config.d
     host: config.db.host,
     dialect: config.db.dialect,
     logging: config.db.logging,
+    dialectOptions: {
+        multipleStatements: true 
+    }
 });
 
 async function connectDB() {
