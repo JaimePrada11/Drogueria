@@ -61,8 +61,8 @@ class ProductoService {
     }
 
 
-    async update(id, newData) {
-        const producto = await this.productoRepositorio.getProductoById(id);
+    async update(sku, newData) {
+        const producto = await this.productoRepositorio.getProductoBySku(sku);
         if (!producto) {
             throw new Error("Producto no encontrado");
         }

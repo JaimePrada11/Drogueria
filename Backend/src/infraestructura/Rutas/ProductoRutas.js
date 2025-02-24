@@ -20,7 +20,7 @@ router.get('/fechaEntrada', productoController.getProductosByFechaEntrada);
 
 router.post('/', productoController.createProducto);
 
-router.put('/:id', productoController.updateProducto);
+router.put('/:sku', productoController.updateProducto);
 
 router.delete('/:sku', productoController.deleteProducto);
 

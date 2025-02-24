@@ -17,9 +17,12 @@ class ProductoController {
 
     updateProducto = async (req, res) => {
         try {
-            const id = req.params.id;
+            const { sku } = req.params; 
+            if (!sku) {
+                return res.status(400).json({ message: 'El SKU es obligatorio' });
+            }
             const producto = req.body;
-            const productoActualizado = await this.productoService.update(id, producto);
+            const productoActualizado = await this.productoService.update(sku, producto);
             res.json(productoActualizado);
         } catch (error) {
             res.status(500).json({ message: 'Error al actualizar producto', error });
