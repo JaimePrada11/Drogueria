@@ -2,8 +2,9 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: "http://drogueria-production-1be1.up.railway.app/api/",
+  baseURL: "https://drogueria-production-1be1.up.railway.app/api/",
 });
+
 
 const useApi = (endpoint) => {
   const [data, setData] = useState([]);
