@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:8080/api/",
+  baseURL: "http://drogueria-production-1be1.up.railway.app/api/",
 });
 
 const useApi = (endpoint) => {
