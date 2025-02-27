@@ -10,7 +10,7 @@ async function startServer() {
         await connectDB();
         
         await sequelize.sync({ alter: true });
-        await seedDatabase();
+       // await seedDatabase();
         console.log("Base de datos sincronizada.");
 
         const port = process.env.PORT || 3000;
